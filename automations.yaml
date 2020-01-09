@@ -1,0 +1,81 @@
+
+### Send notifications when PowerPlug switch is set to ON
+  - alias: PowerPlugOn
+    trigger:
+      platform: state
+      entity_id: switch.neo_coolcam_power_plug_12a_switch
+      from: "off"
+      to: "on"
+    action:
+      - service: notify.hassgmail
+        data:
+          title: "PowerPlug is on"
+          message: "S-a activat priza ! {{now().strftime('%Y.%m.%d-%H:%M:%S')}}"
+       
+
+### Send notifications when PowerPlug switch is set to OFF
+  - alias: PowerPlugOff
+    trigger:
+      platform: state
+      entity_id: switch.neo_coolcam_power_plug_12a_switch
+      from: "on"
+      to: "off"
+    action:
+      - service: notify.hassgmail
+        data:
+          title: "PowerPlug is off"
+          message: "S-a dezactivat priza ! {{now().strftime('%Y.%m.%d-%H:%M:%S')}}"
+
+
+### Send notifications when PowerPlug switch detects power outage
+  - alias: PowerFailure
+    trigger:
+      #- platform: time
+      #  minutes: '/1'
+      #  seconds: 00
+      platform: state
+      entity_id: zwave.neo_coolcam_power_plug_12a
+      from: "ready"
+      to: "dead"
+    action:
+      - service: notify.hassgmail
+        data:
+          title: "Power outage"
+          message: "PowerPlug a detectat ca s-a luat curentul! {{now().strftime('%Y.%m.%d-%H:%M:%S')}}"
+       
+
+### Send notifications when PowerPlug switch detects power recovery
+  - alias: PowerFailureRecovery
+    trigger:
+      platform: state
+      entity_id: zwave.neo_coolcam_power_plug_12a
+      from: "dead"
+      to: "ready"
+    action:
+      - service: notify.hassgmail
+        data:
+          title: "Power outage recovery"
+          message: "PowerPlug aa detectat ca a revenit curentul! {{now().strftime('%Y.%m.%d-%H:%M:%S')}}"
+
+
+### Program de lucru pentru pompa de caldura via priza programabila
+  - alias: ProgramPompaDeCaldura
+    trigger:
+    - platform: time
+      at: '03:00:00'   #on
+    - platform: time
+      at: '06:00:00'   #off
+    - platform: time
+      at: '15:00:00'   #on
+    - platform: time
+      at: '18:00:00'   #off
+    - platform: time
+      at: '19:00:00'   #on
+    - platform: time
+      at: '21:00:00'   #off
+    action:
+      entity_id: switch.neo_coolcam_power_plug_12a_switch
+      service_template: >
+        {% if is_state ('switch.neo_coolcam_power_plug_12a_switch' , 'off') %} homeassistant.turn_on
+        {% else %} homeassistant.turn_off
+        {% endif %}

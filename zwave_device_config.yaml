@@ -1,0 +1,6 @@
+switch.switch:
+  ignored: false
+  polling_intensity: 0
+switch.neo_coolcam_alarm_switch:
+  ignored: false
+  polling_intensity: 0

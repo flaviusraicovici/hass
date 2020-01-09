@@ -1,0 +1,197 @@
+### Send notifications when Alarm switch is set to ON
+  - alias: AlarmOn
+    trigger:
+      platform: state
+      entity_id: switch.neo_coolcam_siren_alarm_switch
+      from: "off"
+      to: "on"
+    action:
+      #- delay:
+      #    seconds: 2
+      #- service: notify.mypushbullet
+      - service: notify.hassgmail
+        data_template:
+          title: "Alarm is on"
+          message: "S-a activat alarma !!!"
+          data: {}
+
+### Send notifications when Alarm switch is set to OFF
+  - alias: AlarmOff
+    trigger:
+      platform: state
+      entity_id: switch.neo_coolcam_siren_alarm_switch
+      from: "on"
+      to: "off"
+    action:
+      #- delay:
+      #    seconds: 2
+      #- service: notify.mypushbullet
+      - service: notify.hassgmail
+        data_template:
+          title: "Alarm is off"
+          message: "S-a oprit alarma !"
+          data: {}
+
+### Send notifications when PowerPlug switch is set to ON
+  - alias: PowerPlugOn
+    trigger:
+      platform: state
+      entity_id: switch.neo_coolcam_power_plug_12a_switch
+      from: "off"
+      to: "on"
+    action:
+      - service: notify.hassgmail
+        data:
+          title: "PowerPlug is on"
+          message: "S-a activat priza !"
+       
+
+### Send notifications when PowerPlug switch is set to OFF
+  - alias: PowerPlugOff
+    trigger:
+      platform: state
+      entity_id: switch.neo_coolcam_power_plug_12a_switch
+      from: "on"
+      to: "off"
+    action:
+      - service: notify.hassgmail
+        data:
+          title: "PowerPlug is off"
+          message: "S-a dezactivat priza !"
+
+
+### Send notifications when PowerPlug switch detects power outage
+  - alias: PowerFailure
+    trigger:
+      platform: state
+      entity_id: zwave.neo_coolcam_power_plug_12a
+      from: "ready"
+      to: "dead"
+    action:
+      - service: notify.hassgmail
+        data:
+          title: "Power outage"
+          message: "PowerPlug a detectat ca s-a luat curentul!"
+       
+
+### Send notifications when PowerPlug switch detects power recovery
+  - alias: PowerFailureRecovery
+    trigger:
+      platform: state
+      entity_id: zwave.neo_coolcam_power_plug_12a
+      from: "dead"
+      to: "ready"
+    action:
+      - service: notify.hassgmail
+        data:
+          title: "Power outage recovery"
+          message: "PowerPlug aa detectat ca a revenit curentul!"
+
+
+### Turn ON PowerPlug switch when PIR sensor detects some movement
+  - alias: Turn on PowerPlug when there is movement
+    trigger:
+      platform: state
+      entity_id: binary_sensor.neo_coolcam_battery_powered_pir_sensor_sensor
+      from: "off"
+      to: "on"
+    action:
+      #- delay:
+      #    seconds: 2
+      #- service: notify.mypushbullet
+      - service: notify.hassgmail
+        data_template:
+          title: "PIR movement detected"
+          message: "S-a detectat miscare in camera tehnica !"
+          data: {}
+      - service: homeassistant.turn_on
+        entity_id: switch.neo_coolcam_power_plug_12a_switch
+
+### Turn OFF PowerPlug switch 1 minute after PIR sensor detected a movement
+  - alias: Turn off PowerPlug 1 minute after last movement
+    trigger:
+      platform: state
+      entity_id: binary_sensor.neo_coolcam_battery_powered_pir_sensor_sensor
+      from: "on"
+      to: "off"
+      for:
+        minutes: 1
+    action:
+        #- delay:
+        #    seconds: 2
+        #- service: notify.mypushbullet
+        - service: notify.hassgmail
+          data_template:
+            title: "PIR enters in idle"
+            message: "Se pare ca nu mai e nimeni in camera tehnica !"
+            data: {}
+        - service: homeassistant.turn_off
+          entity_id: switch.neo_coolcam_power_plug_12a_switch
+
+### Send notifications when flood is detected
+  - alias: FloodOn
+    trigger:
+      platform: state
+      entity_id: binary_sensor.neo_coolcam_water_leakage_detector_sensor
+      from: "off"
+      to: "on"
+    action:
+      #- delay:
+      #    seconds: 2
+      #- service: notify.mypushbullet
+      - service: notify.hassgmail
+        data_template:
+          title: "Flood detected"
+          message: "Inundatie !!!"
+          data: {}
+
+### Send notifications when no liquid is detected by the flood sensor anymore
+  - alias: FloodOff
+    trigger:
+      platform: state
+      entity_id: binary_sensor.neo_coolcam_water_leakage_detector_sensor
+      from: "on"
+      to: "off"
+    action:
+      #- delay:
+      #    seconds: 2
+      # - service: notify.mypushbullet
+      - service: notify.hassgmail
+        data_template:
+          title: "Flood clearance"
+          message: "S-a rezolvat cu inundatia, au ramas pagubele"
+          data: {}
+
+### Send notifications when garrage door is open
+  - alias: DoorOpen
+    trigger:
+      platform: state
+      entity_id: binary_sensor.neo_coolcam_doorwindow_detector_sensor
+      from: "off"
+      to: "on"
+    action:
+      #- delay:
+      #    seconds: 2
+      #- service: notify.mypushbullet
+      - service: notify.hassgmail
+        data_template:
+          title: "Garrage door open"
+          message: "Usa de la garaj a fost deschisa"
+          data: {}
+
+### Send notifications when garrage door is closed
+  - alias: DoorClosed
+    trigger:
+      platform: state
+      entity_id: binary_sensor.neo_coolcam_doorwindow_detector_sensor
+      from: "on"
+      to: "off"
+    action:
+      #- delay:
+      #    seconds: 2
+      #- service: notify.mypushbullet
+      - service: notify.hassgmail
+        data_template:
+          title: "Garrage door closed"
+          message: "Usa de la garaj a fost inchisa"
+          data: {}
